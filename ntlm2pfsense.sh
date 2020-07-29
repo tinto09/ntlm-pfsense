@@ -1,22 +1,6 @@
 #!/bin/sh
 
-VERSION='20180302001' # Welcome to Portugal
-
-if [ -f "/etc/samba.patch.version" ]; then
-	if [ "$(cat /etc/samba.patch.version)" = "$VERSION" ]; then
-		echo "ERROR: Changes have been applied!"
-		exit 2
-	fi
-fi
-
-# Verifica versao pfSense
-if [ "$(cat /etc/version)" != "2.4.3-RELEASE" ]; then
-	echo "ERROR: You need the pfSense version 2.4.3 to apply this script"
-	exit 2
-fi
-
-ASSUME_ALWAYS_YES=YES
-export ASSUME_ALWAYS_YES
+VERSION='29072020' 
 
 /usr/sbin/pkg bootstrap
 /usr/sbin/pkg update
@@ -25,24 +9,27 @@ export ASSUME_ALWAYS_YES
 /usr/sbin/pkg lock pkg
 /usr/sbin/pkg lock pfSense-2.4.3
 
+rm /usr/local/etc/pkg/repos/FreeBSD.conf
+
 mkdir -p /usr/local/etc/pkg/repos
 
-cat <<EOF > /usr/local/etc/pkg/repos/pf2ad.conf
-pf2ad: {
-    url: "https://github.com/pf2ad/packages/raw/11.1",
-    mirror_type: "https",
-    enabled: yes
+cat <<EOF > /usr/local/etc/pkg/repos/FreeBSD.conf
+FreeBSD: {
+  url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest",
+  mirror_type: "srv",
+  signature_type: "fingerprints",
+  fingerprints: "/usr/share/keys/pkg",
+  enabled: yes
 }
 EOF
 
-/usr/sbin/pkg update -r pf2ad
-/usr/sbin/pkg install -r pf2ad net/samba44 2> /dev/null
+sed -i.bak '/FreeBSD/d' /usr/local/etc/pkg/repos/pfSense.conf
+
+/usr/sbin/pkg update -r FreeBSD
+/usr/sbin/pkg install net/samba410 2> /dev/null
 
 /usr/sbin/pkg unlock pkg
-/usr/sbin/pkg unlock pfSense-2.4.3
-
-rm -rf /usr/local/etc/pkg/repos/pf2ad.conf
-/usr/sbin/pkg update
+/usr/sbin/pkg unlock pfSense-2.4.5
 
 mkdir -p /var/db/samba4/winbindd_privileged
 chown -R :proxy /var/db/samba4/winbindd_privileged
