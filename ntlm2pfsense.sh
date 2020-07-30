@@ -5,10 +5,6 @@ VERSION='29072020'
 /usr/sbin/pkg bootstrap
 /usr/sbin/pkg update
 
-# Lock packages necessary
-/usr/sbin/pkg lock pkg
-/usr/sbin/pkg lock pfSense-2.4.5
-
 rm /usr/local/etc/pkg/repos/FreeBSD.conf
 
 mkdir -p /usr/local/etc/pkg/repos
