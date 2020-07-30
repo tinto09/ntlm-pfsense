@@ -7,7 +7,7 @@ VERSION='29072020'
 
 # Lock packages necessary
 /usr/sbin/pkg lock pkg
-/usr/sbin/pkg lock pfSense-2.4.3
+/usr/sbin/pkg lock pfSense-2.4.5
 
 rm /usr/local/etc/pkg/repos/FreeBSD.conf
 
